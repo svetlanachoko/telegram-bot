@@ -12,4 +12,5 @@ def send_welcome(message):
 def echo_all(message):
     bot.reply_to(message, "🎩 Судьба загадочна... но шоколад всегда помогает!")
 
-bot.polling()
+bot.infinity_polling()
+
