@@ -4,7 +4,8 @@ from flask import Flask, request
 import os
 from waitress import serve
 
-TOKEN = os.getenv("TOKEN")
+# --- Настройки ---
+TOKEN = os.getenv("TOKEN")  # Получаем токен из переменных окружения
 bot = telebot.TeleBot(TOKEN)
 
 # --- Пророчества Мадам Люмины ---
@@ -25,18 +26,10 @@ archetypes = {
     "Шут": "Тебе всё кажется абсурдом? Отлично, ты понял суть жизни.",
 }
 
-# --- Загадки для алхимии ---
-alchemy_riddles = {
-    "Я белый, но не снег. Меня добавляют в тесто, но не всегда сладкое. Что я?": "Мука",
-    "Меня можно жевать, но я не жвачка. Меня можно пить, но я не вода. Что я?": "Шоколад",
-    "Если смешать солнце и море, что получится?": "Соль",
-    "Я твёрдый, но во рту исчезаю. Кто я?": "Сахар",
-}
-
 # --- Обработчики команд ---
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
-    bot.reply_to(message, "Привет! Я бот Мадам Люмины. Напиши /пророчество, /архетип или /загадка.")
+    bot.reply_to(message, "Привет! Я бот Мадам Люмины. Напиши /пророчество или /архетип.")
 
 @bot.message_handler(commands=['пророчество'])
 def send_prophecy(message):
@@ -47,15 +40,6 @@ def send_prophecy(message):
 def send_archetype(message):
     archetype, description = random.choice(list(archetypes.items()))
     bot.reply_to(message, f"🎭 Сегодня твой архетип: *{archetype}*\n_{description}_", parse_mode='Markdown')
-
-@bot.message_handler(commands=['загадка'])
-def send_riddle(message):
-    riddle, answer = random.choice(list(alchemy_riddles.items()))
-    bot.reply_to(message, f"🧪 Загадка: {riddle}\nОтвет напиши в чат!")
-
-@bot.message_handler(func=lambda message: message.text in alchemy_riddles.values())
-def check_answer(message):
-    bot.reply_to(message, "🎉 Верно! Ты получил ингредиент для алхимии!")
 
 # --- Flask вебхук ---
 app = Flask(__name__)
@@ -68,10 +52,8 @@ def getMessage():
 @app.route('/')
 def webhook():
     bot.remove_webhook()
-    bot.set_webhook(url=f'https://yourappname.onrender.com/{TOKEN}')  # Убедись, что URL правильный
+    bot.set_webhook(url=f'https://telegram-bot-ljm6.onrender.com/{TOKEN}')  # ← Твой реальный домен!
     return "Webhook set", 200
 
 if __name__ == "__main__":
     serve(app, host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
-
-   
